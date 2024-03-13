@@ -1,7 +1,8 @@
-# async_task_processor/async_task_processor.py
+# concurrent_tasking/task_manager.py
 import asyncio
 from .models import Task, TaskStatus
 from .utils import time_helper
+from typing import Any, Dict, List, Optional, Union, Callable, Any
 
 
 class TaskManager:
@@ -26,17 +27,43 @@ class TaskManager:
             self.queue_order = []
             self.is_initialized = True
 
-    async def add_task(self, task: Task):
+    async def add_task(self, task: Task) -> str:
         """
         Adds a task to the queue and registers it in the task registry.
 
         Args:
             task (Task): The task object to be added to the queue.
+            
+        Returns:
+            str: The unique identifier of the task.
         """
         await self.task_queue.put(task)
         self.task_registry[task.task_id] = task
         self.queue_order.append(task.task_id)  # Add task ID to queue_order list
         task.status = TaskStatus.QUEUED
+        return task.task_id
+
+    async def add_task_directly(
+        self,
+        function: Callable,
+        args: Optional[List[Any]] = None,
+        kwargs: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        """
+        Adds a task directly to the queue without requiring an explicit Task instance.
+
+        Args:
+            function (Callable): The function to execute as part of the task.
+            args (Optional[List[Any]]): Positional arguments for the task function.
+            kwargs (Optional[Dict[str, Any]]): Keyword arguments for the task function.
+            
+        Returns:
+            str: The unique identifier of the task.
+        """
+
+        task = Task(function=function, args=args or [], kwargs=kwargs or {})
+
+        return self.add_task(task)
 
     async def process_tasks(self):
         while True:

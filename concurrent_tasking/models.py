@@ -1,6 +1,7 @@
-# async_task_processor/models.py
+# concurrent_tasking/models.py
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, Callable
+from uuid import uuid4
 from pydantic import BaseModel, Field
 from enum import Enum
 from .utils import time_helper
@@ -23,7 +24,7 @@ class Task(BaseModel):
     Represents a task to be processed, including its ID, status, the function to execute, its arguments, and the result.
     """
 
-    task_id: str
+    task_id: str = Field(default_factory=lambda: str(uuid4()))
     status: TaskStatus = TaskStatus.DANGLING
     function: Callable
     args: Optional[List[Any]] = []  # Positional arguments for the processing function
@@ -34,6 +35,7 @@ class Task(BaseModel):
     created_at: datetime = Field(default_factory=time_helper.get_current_time)
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
+    priority: int = Field(default=0)  # Default priority level set to 0
 
     @property
     def processing_duration_in_seconds(self) -> Optional[int]:
@@ -49,7 +51,9 @@ class Task(BaseModel):
         if self.started_at is None:
             return None
 
-        end_time = self.completed_at if self.completed_at else time_helper.get_current_time()
+        end_time = (
+            self.completed_at if self.completed_at else time_helper.get_current_time()
+        )
         duration = end_time - self.started_at
 
         return int(duration.total_seconds())
@@ -68,7 +72,9 @@ class Task(BaseModel):
         if self.created_at is None:
             return None
 
-        end_time = self.completed_at if self.completed_at else time_helper.get_current_time()
+        end_time = (
+            self.completed_at if self.completed_at else time_helper.get_current_time()
+        )
         duration = end_time - self.created_at
 
         return int(duration.total_seconds())
