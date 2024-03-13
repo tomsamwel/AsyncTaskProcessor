@@ -1,58 +1,59 @@
-# Async Task Processor
 
-The Async Task Processor is a lightweight, easy-to-use Python library designed to manage and process asynchronous tasks efficiently. Utilizing Python's asyncio library, it offers a straightforward way to queue tasks, process them asynchronously, and retrieve their statuses and results.
+# ConcurrentTasking
+
+`ConcurrentTasking` is a powerful, yet straightforward Python library for managing and processing tasks concurrently. Leveraging Python's `asyncio` library, it simplifies the queuing and asynchronous execution of tasks, providing real-time updates on their progress and outcomes.
 
 ## Features
 
-- Simple task queue management.
-- Asynchronous processing of tasks with real-time status updates.
-- Flexible task creation supporting any callable Python function.
-- Comprehensive task status tracking, from queued to completed or failed.
+- Efficient management of a task queue for concurrent processing.
+- Asynchronous execution of tasks with live updates on their status.
+- Supports any callable Python function for flexible task creation.
+- Detailed tracking of task statuses, from queued to completed or failed.
 
 ## Installation
 
-Install async_task_processor using pip:
+Install `ConcurrentTasking` using pip:
 
 ```bash
-pip install async_task_processor
+pip install ConcurrentTasking
 ```
 
 ## Quick Start
 
-To get started with Async Task Processor, follow these steps:
+Here's how to get up and running with `ConcurrentTasking`:
 
-1. **Create a Task**
+1. **Define a Task**
 
 ```python
-from async_task_processor.models import Task
+from concurrent_tasking.models import Task
 
-# Define your asynchronous function
+# Define an asynchronous function for your task
 async def sample_task_function(arg1, arg2):
-    # Your async task logic here
+    # Task logic here
     return arg1 + arg2
 
-# Create a task
+# Create a task instance
 task = Task(task_id="1", function=sample_task_function, args=[10, 20])
 ```
 
-2. **Initialize the Processor and Add Tasks**
+2. **Initialize the Task Manager and Add Tasks**
 
 ```python
-from async_task_processor.async_task_processor import AsyncTaskProcessor
+from concurrent_tasking.task_manager import TaskManager
 
-processor = AsyncTaskProcessor()
+manager = TaskManager()
 
-# Add tasks to the processor
-await processor.add_task(task)
+# Queue tasks for processing
+await manager.add_task(task)
 ```
 
-3. **Process the Tasks**
+3. **Start Task Processing**
 
 ```python
-# Start processing tasks
-await processor.process_tasks()
+# Begin processing queued tasks
+await manager.process_tasks()
 ```
 
-## Contribute
+## Contributing
 
-Contributions are welcome! If you have a feature request, bug report, or a pull request, please open an issue or submit a pull request.
+Your contributions make `ConcurrentTasking` even better! Whether it's a feature request, bug report, or a pull request, we warmly welcome your input. Please feel free to open an issue or submit a PR.

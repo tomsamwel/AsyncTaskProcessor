@@ -1,14 +1,16 @@
 # async_task_processor/models.py
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union, Callable
-from pydantic import BaseModel, validator, Field
+from pydantic import BaseModel, Field
 from enum import Enum
-from .utils import time
+from .utils import time_helper
+
 
 class TaskStatus(Enum):
     """
     Enum representing the possible statuses of a task.
     """
+
     DANGLING = "dangling"
     QUEUED = "queued"
     PROCESSING = "processing"
@@ -25,9 +27,11 @@ class Task(BaseModel):
     status: TaskStatus = TaskStatus.DANGLING
     function: Callable
     args: Optional[List[Any]] = []  # Positional arguments for the processing function
-    kwargs: Optional[Dict[str, Any]] = {}  # Keyword arguments for the processing function
+    kwargs: Optional[Dict[str, Any]] = (
+        {}
+    )  # Keyword arguments for the processing function
     result: Optional[Union[List, dict]] = None
-    created_at: datetime = Field(default_factory=time.get_current_time)
+    created_at: datetime = Field(default_factory=time_helper.get_current_time)
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
 
@@ -45,7 +49,7 @@ class Task(BaseModel):
         if self.started_at is None:
             return None
 
-        end_time = self.completed_at if self.completed_at else time.get_current_time()
+        end_time = self.completed_at if self.completed_at else time_helper.get_current_time()
         duration = end_time - self.started_at
 
         return int(duration.total_seconds())
@@ -64,16 +68,16 @@ class Task(BaseModel):
         if self.created_at is None:
             return None
 
-        end_time = self.completed_at if self.completed_at else time.get_current_time()
+        end_time = self.completed_at if self.completed_at else time_helper.get_current_time()
         duration = end_time - self.created_at
 
         return int(duration.total_seconds())
-    
+
     def dict(self, **kwargs):
         """
         Override the dict method to include properties.
         """
         d = super().dict(**kwargs)
-        d['processing_duration_in_seconds'] = self.processing_duration_in_seconds
-        d['total_duration_in_seconds'] = self.total_duration_in_seconds
+        d["processing_duration_in_seconds"] = self.processing_duration_in_seconds
+        d["total_duration_in_seconds"] = self.total_duration_in_seconds
         return d
